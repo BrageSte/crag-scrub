@@ -1,0 +1,27 @@
+[project]
+name = "crag-scrub"
+version = "0.1.0"
+description = "Scrape climbing locations from multiple sources into a unified dataset."
+requires-python = ">=3.11"
+authors = [{name = "Your Name"}]
+readme = "README.md"
+dependencies = [
+  "requests>=2.32.3",
+  "beautifulsoup4>=4.12.3",
+  "pydantic>=2.7.4",
+  "PyYAML>=6.0.1",
+  "tenacity>=8.4.2"
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.2.2"]
+
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]

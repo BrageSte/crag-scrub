@@ -1,0 +1,21 @@
+# Sources configured for a Europe-focused run. Duplicate or edit this file to
+# include authentication tokens if you have them; the defaults rely on public
+# endpoints only.
+sources:
+  - name: thecrag
+    options:
+      base_url: https://www.thecrag.com/api
+      min_delay: 1.5
+  - name: 27crags
+    options:
+      base_url: https://27crags.com
+      min_delay: 2
+
+# Optional scoping by country. Each scraper may read the "country" key to limit
+# the search. You can also set per-scraper scope using the class name keys.
+scope:
+  country: Norway
+  TheCragScraper:
+    country: Norway
+  TwentySevenCragsScraper:
+    country: Norway
