@@ -26,6 +26,20 @@
 
 4. Inspect results with standard JSON tooling or transform them for your target database.
 
+## Run from a browser
+If you prefer a browser-driven experience, launch the FastAPI app and use the interactive docs:
+
+```bash
+uvicorn cragscrub.web:app --host 0.0.0.0 --port 8000
+```
+
+Then open `http://localhost:8000/docs` in your browser, expand the `/scrape` endpoint, and provide:
+- `config`: path to your YAML config (e.g., `config/europe.example.yml`)
+- `output`: where to write the NDJSON (directories are created if needed)
+- `geojson` (optional): path for an additional GeoJSON export
+
+Successful requests return counts and the output paths; the files are written locally where the server runs.
+
 ## Project layout
 - `src/cragscrub/models.py` – Pydantic data models for `Crag` and `Region`.
 - `src/cragscrub/sources/` – Scrapers per upstream source and the shared `BaseScraper`.
