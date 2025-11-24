@@ -5,7 +5,15 @@ from pathlib import Path
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 
-from cragscrub.pipeline import build_scrapers, load_config, run_sources, write_geojson, write_ndjson
+from cragscrub.pipeline import (
+    apply_filters,
+    build_scrapers,
+    deduplicate_crags,
+    load_config,
+    run_sources,
+    write_geojson,
+    write_ndjson,
+)
 
 
 app = FastAPI(
@@ -47,15 +55,18 @@ def _run_scrape(request: ScrapeRequest) -> ScrapeResult:
     config = load_config(str(config_path))
     scrapers = build_scrapers(config)
     scope = config.get("scope")
+    filters = config.get("filters")
 
     regions, crags = run_sources(scrapers, scope=scope)
-    write_ndjson([*regions, *crags], str(output_path))
+    filtered_crags = apply_filters(crags, filters)
+    deduped_crags = deduplicate_crags(filtered_crags)
+    write_ndjson([*regions, *deduped_crags], str(output_path))
     if geojson_path:
-        write_geojson(crags, str(geojson_path))
+        write_geojson(deduped_crags, str(geojson_path))
 
     return ScrapeResult(
         regions=len(regions),
-        crags=len(crags),
+        crags=len(deduped_crags),
         output=str(output_path),
         geojson=str(geojson_path) if geojson_path else None,
     )

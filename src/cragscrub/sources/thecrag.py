@@ -4,7 +4,7 @@ from typing import Iterable, Optional
 
 from bs4 import BeautifulSoup
 
-from cragscrub.models import Coordinates, Crag, Region
+from cragscrub.models import Crag, Region
 from cragscrub.sources.base import BaseScraper
 
 
@@ -33,9 +33,7 @@ class TheCragScraper(BaseScraper):
             yield Region(
                 id=str(area.get("id")),
                 name=area.get("name", "Unknown"),
-                country=area.get("country"),
-                state=area.get("state"),
-                municipality=area.get("locality"),
+                country_code=area.get("countryCode") or area.get("country"),
                 parent_id=str(area.get("parentId")) if area.get("parentId") else None,
                 source="thecrag",
                 source_url=area.get("url"),
@@ -48,19 +46,26 @@ class TheCragScraper(BaseScraper):
         response = self._get("/crags", params=params)
         payload = response.json().get("crags", [])
         for item in payload:
-            coords = _coords_from_point(item.get("point"))
+            coords = item.get("point") or {}
             yield Crag(
-                id=str(item.get("id")),
-                name=item.get("name", "Unnamed crag"),
-                region_id=str(item.get("areaId")) if item.get("areaId") else None,
-                coordinates=coords,
-                municipality=item.get("locality"),
-                country=item.get("country"),
-                elevation_m=item.get("elevation"),
-                climbing_styles=item.get("styles", []) or [],
-                route_count=item.get("routeCount"),
                 source="thecrag",
+                source_id=str(item.get("id")),
                 source_url=item.get("url"),
+                name=item.get("name", "Unnamed crag"),
+                region=str(item.get("area")) if item.get("area") else None,
+                subregion=item.get("locality"),
+                country_code=item.get("countryCode") or item.get("country"),
+                lat=coords.get("lat") or coords.get("latitude"),
+                lon=coords.get("lon") or coords.get("longitude"),
+                elevation=item.get("elevation"),
+                climbing_styles=item.get("styles", []) or [],
+                num_routes=item.get("routeCount"),
+                quality_score=item.get("qualityScore"),
+                is_indoor=bool(item.get("indoor", False)),
+                is_boulder_only=bool(item.get("boulder", False)),
+                access_status=item.get("accessStatus", "unknown") or "unknown",
+                short_description=item.get("description"),
+                provenance="thecrag_api",
             )
 
     def scrape_area_page(self, url: str) -> Optional[tuple[Optional[int], list[str]]]:
@@ -79,13 +84,3 @@ class TheCragScraper(BaseScraper):
         routes_text = stats.select_one(".route-count")
         route_count = int(routes_text.get_text(strip=True)) if routes_text else None
         return route_count, styles
-
-
-def _coords_from_point(point: dict | None) -> Optional[Coordinates]:
-    if not point:
-        return None
-    lat = point.get("lat") or point.get("latitude")
-    lon = point.get("lon") or point.get("longitude")
-    if lat is None or lon is None:
-        return None
-    return Coordinates(lat=lat, lon=lon)

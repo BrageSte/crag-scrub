@@ -4,7 +4,7 @@ from typing import Iterable, Optional
 
 from bs4 import BeautifulSoup
 
-from cragscrub.models import Coordinates, Crag, Region
+from cragscrub.models import Crag, Region
 from cragscrub.sources.base import BaseScraper
 
 
@@ -29,8 +29,7 @@ class TwentySevenCragsScraper(BaseScraper):
             yield Region(
                 id=str(area.get("id")),
                 name=area.get("name", "Unknown"),
-                country=area.get("country"),
-                municipality=area.get("municipality"),
+                country_code=area.get("country_code") or area.get("country"),
                 parent_id=str(area.get("parent_id")) if area.get("parent_id") else None,
                 source="27crags",
                 source_url=area.get("url"),
@@ -42,18 +41,25 @@ class TwentySevenCragsScraper(BaseScraper):
         params = {"country": country} if country else {}
         response = self._get("/crags.json", params=params)
         for item in response.json().get("crags", []):
-            coords = _coords_from_dict(item)
             yield Crag(
-                id=str(item.get("id")),
-                name=item.get("name", "Unnamed crag"),
-                region_id=str(item.get("area_id")) if item.get("area_id") else None,
-                coordinates=coords,
-                route_count=item.get("route_count"),
-                country=item.get("country"),
-                municipality=item.get("municipality"),
-                climbing_styles=item.get("styles", []) or [],
                 source="27crags",
+                source_id=str(item.get("id")),
                 source_url=item.get("url"),
+                name=item.get("name", "Unnamed crag"),
+                region=item.get("area"),
+                subregion=item.get("municipality"),
+                country_code=item.get("country_code") or item.get("country"),
+                lat=item.get("lat") or item.get("latitude"),
+                lon=item.get("lon") or item.get("longitude"),
+                num_routes=item.get("route_count"),
+                climbing_styles=item.get("styles", []) or [],
+                is_boulder_only=bool(item.get("boulder", False)),
+                access_status=item.get("access_status") or "unknown",
+                quality_score=item.get("quality_score"),
+                short_description=item.get("short_description"),
+                approach_time_min=item.get("approach_time_min"),
+                tags=item.get("tags", []) or [],
+                provenance="27crags_api",
             )
 
     def enrich_from_html(self, url: str) -> Optional[dict]:
@@ -69,16 +75,6 @@ class TwentySevenCragsScraper(BaseScraper):
         if style_badges:
             meta["climbing_styles"] = [badge.get_text(strip=True) for badge in style_badges]
         return meta or None
-
-
-def _coords_from_dict(data: dict) -> Optional[Coordinates]:
-    if not data:
-        return None
-    lat = data.get("lat") or data.get("latitude")
-    lon = data.get("lon") or data.get("longitude")
-    if lat is None or lon is None:
-        return None
-    return Coordinates(lat=lat, lon=lon)
 
 
 def _parse_int(value: str | None) -> Optional[int]:

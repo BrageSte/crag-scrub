@@ -41,11 +41,11 @@ Then open `http://localhost:8000/docs` in your browser, expand the `/scrape` end
 Successful requests return counts and the output paths; the files are written locally where the server runs.
 
 ## Project layout
-- `src/cragscrub/models.py` – Pydantic data models for `Crag` and `Region`.
+- `src/cragscrub/models.py` – Pydantic data models for `Crag` and `Region` with canonical key helpers.
 - `src/cragscrub/sources/` – Scrapers per upstream source and the shared `BaseScraper`.
-- `src/cragscrub/pipeline.py` – Orchestration helpers for running multiple sources and writing outputs.
+- `src/cragscrub/pipeline.py` – Orchestration helpers for running sources, applying filters, deduplicating, and writing outputs.
 - `src/cragscrub/cli.py` – Entry point that wires config, pipeline, and output writers.
-- `config/` – Example YAML configurations demonstrating how to scope regions.
+- `config/` – Example YAML configurations demonstrating how to scope regions and set filter rules.
 
 ## Notes on scraping ethics
 - Always respect each source's terms of service and robots.txt directives.
