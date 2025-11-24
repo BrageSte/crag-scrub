@@ -11,10 +11,6 @@ on:
         description: 'NDJSON output path'
         required: true
         default: 'data/europe.ndjson'
-      geojson:
-        description: 'GeoJSON output path'
-        required: true
-        default: 'data/europe.geojson'
 
 jobs:
   scrape:
@@ -37,16 +33,12 @@ jobs:
       - name: Run cragscrub scrape
         run: |
           mkdir -p "$(dirname "${{ github.event.inputs.output }}")"
-          mkdir -p "$(dirname "${{ github.event.inputs.geojson }}")"
           python -m cragscrub.cli \
             --config "${{ github.event.inputs.config }}" \
-            --output "${{ github.event.inputs.output }}" \
-            --geojson "${{ github.event.inputs.geojson }}"
+            --output "${{ github.event.inputs.output }}"
 
       - name: Upload scrape results as artifact
         uses: actions/upload-artifact@v4
         with:
           name: crag-scrub-output
-          path: |
-            ${{ github.event.inputs.output }}
-            ${{ github.event.inputs.geojson }}
+          path: ${{ github.event.inputs.output }}
