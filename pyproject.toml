@@ -18,6 +18,10 @@ dependencies = [
 [project.optional-dependencies]
 dev = ["pytest>=8.2.2"]
 
+[project.scripts]
+cragscrub-cli = "cragscrub.cli:main"
+cragscrub-gui = "cragscrub.gui:main"
+
 [build-system]
 requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
