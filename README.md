@@ -8,6 +8,9 @@
 - YAML-based run configuration for repeatable exports (e.g., focus on Europe or a specific country) plus filter rules.
 - Deduplication of overlapping crags using canonical keys and simple merge heuristics.
 - Pluggable output writers (NDJSON and GeoJSON helpers provided) that mark whether a crag passed filters.
+- Normalized `Crag` and `Region` models with coordinates, hierarchy, and provenance metadata.
+- YAML-based run configuration for repeatable exports (e.g., focus on Europe or a specific country).
+- Pluggable output writers (NDJSON and GeoJSON helpers provided).
 - Retry-aware HTTP client with polite defaults you can tune per source.
 
 ## Getting started
@@ -19,6 +22,7 @@
    ```
 
 2. Prepare a run configuration (see [`config/europe.example.yml`](config/europe.example.yml)) that lists the sources you want to hit, any geographic scope, and filter rules (e.g., `min_routes`, `exclude_indoor`).
+2. Prepare a run configuration (see [`config/europe.example.yml`](config/europe.example.yml)) that lists the sources you want to hit and how to filter them.
 
 3. Run the CLI:
    ```bash
@@ -31,6 +35,7 @@
 - **Crag** fields include source identifiers, hierarchy (`country_code`, `region`, `subregion`), coordinates/geometry (`lat`, `lon`, `bbox`), climbing metadata (`rock_type`, `climbing_styles`, `num_routes`, `grade_min/max`, `quality_score`), access/practical info, and internal metadata (`canonical_key`, `effective_filter_passed`, `merged_from`).
 - **Region** fields include a hierarchy (`parent_id`, `type`), `country_code`, optional `bbox`, and provenance.
 - Canonical keys combine normalized names with country/rounded coordinates to deduplicate across sources; merged crags carry the `merged_from` list for provenance.
+4. Inspect results with standard JSON tooling or transform them for your target database.
 
 ## Run from a browser
 If you prefer a browser-driven experience, launch the FastAPI app and use the interactive docs:
