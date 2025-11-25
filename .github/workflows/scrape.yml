@@ -1,0 +1,44 @@
+name: Scrape crags
+
+on:
+  workflow_dispatch:
+    inputs:
+      config:
+        description: 'Path to YAML config file'
+        required: true
+        default: 'config/europe.example.yml'
+      output:
+        description: 'NDJSON output path'
+        required: true
+        default: 'data/europe.ndjson'
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install crag-scrub
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .
+
+      - name: Run cragscrub scrape
+        run: |
+          mkdir -p "$(dirname "${{ github.event.inputs.output }}")"
+          python -m cragscrub.cli \
+            --config "${{ github.event.inputs.config }}" \
+            --output "${{ github.event.inputs.output }}"
+
+      - name: Upload scrape results as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: crag-scrub-output
+          path: ${{ github.event.inputs.output }}
