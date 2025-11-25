@@ -1,0 +1,33 @@
+[project]
+name = "crag-scrub"
+version = "0.1.0"
+description = "Scrape climbing locations from multiple sources into a unified dataset."
+requires-python = ">=3.11"
+authors = [{name = "Your Name"}]
+readme = "README.md"
+dependencies = [
+  "requests>=2.32.3",
+  "beautifulsoup4>=4.12.3",
+  "pydantic>=2.7.4",
+  "PyYAML>=6.0.1",
+  "tenacity>=8.4.2",
+  "fastapi>=0.111.0",
+  "uvicorn>=0.30.1"
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.2.2"]
+
+[project.scripts]
+cragscrub-cli = "cragscrub.cli:main"
+cragscrub-gui = "cragscrub.gui:main"
+
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]

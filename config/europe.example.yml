@@ -1,0 +1,44 @@
+# Sources configured for a Europe-focused run. Duplicate or edit this file to
+# include authentication tokens if you have them; the defaults rely on public
+# endpoints only.
+sources:
+  - name: thecrag
+    options:
+      # Uses the public HTML map instead of the API
+      base_url: https://www.thecrag.com
+      min_delay: 1.5
+  - name: 27crags
+    options:
+      base_url: https://27crags.com
+      min_delay: 2
+
+# Optional scoping. Each scraper may read the "country" key to limit
+# the search. You can also set per-scraper scope using the class name keys.
+scope:
+  country: Norway
+  countries:
+    - NO
+    - SE
+  bbox:
+    min_lat: 57.9
+    min_lon: 4.5
+    max_lat: 71.2
+    max_lon: 31.1
+  TheCragScraper:
+    country: Norway
+    # Optional explicit map path if you want something other than the country
+    # slug (e.g., "europe" or a specific area path like "norway/nissedal")
+    # map_path: europe
+  TwentySevenCragsScraper:
+    country: Norway
+
+filters:
+  exclude_indoor: true
+  exclude_via_ferrata: true
+  exclude_ice: true
+  min_routes: 3
+  require_latlon: true
+  require_name: true
+  min_quality_score: 0.2
+  exclude_closed: true
+  include_restricted: false
