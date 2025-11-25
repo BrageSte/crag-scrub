@@ -4,8 +4,7 @@
 sources:
   - name: thecrag
     options:
-      # Uses the public HTML map instead of the API
-      base_url: https://www.thecrag.com
+      base_url: https://www.thecrag.com/api
       min_delay: 1.5
   - name: 27crags
     options:
@@ -26,9 +25,6 @@ scope:
     max_lon: 31.1
   TheCragScraper:
     country: Norway
-    # Optional explicit map path if you want something other than the country
-    # slug (e.g., "europe" or a specific area path like "norway/nissedal")
-    # map_path: europe
   TwentySevenCragsScraper:
     country: Norway
 

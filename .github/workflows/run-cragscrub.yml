@@ -1,0 +1,53 @@
+name: Run crag-scrub (click to run)
+
+on:
+  workflow_dispatch:
+    inputs:
+      config:
+        description: 'Path to YAML config file'
+        required: true
+        default: 'config/europe.example.yml'
+      output_basename:
+        description: 'Base name for output files (without extension)'
+        required: true
+        default: 'europe'
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install crag-scrub
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .
+
+      - name: Run cragscrub scrape
+        run: |
+          OUTPUT_DIR="data"
+          BASENAME="${{ github.event.inputs.output_basename }}"
+          mkdir -p "${OUTPUT_DIR}"
+          NDJSON_PATH="${OUTPUT_DIR}/${BASENAME}.ndjson"
+
+          echo "Using config: ${{ github.event.inputs.config }}"
+          echo "Writing NDJSON to: ${NDJSON_PATH}"
+
+          python -m cragscrub.cli \
+            --config "${{ github.event.inputs.config }}" \
+            --output "${NDJSON_PATH}"
+
+          echo "NDJSON_PATH=${NDJSON_PATH}" >> $GITHUB_ENV
+
+      - name: Upload scrape results as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: crag-scrub-output
+          path: ${{ env.NDJSON_PATH }}
